@@ -35,5 +35,5 @@
     ],
     "seconds": "int"
   },
-  "image": "homeassistant/{arch}-addon-cloudflareddns"
+  "image": "hub/{arch}-coffee-maker"
 }
