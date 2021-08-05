@@ -1,5 +1,5 @@
 {
-  "name": "Hass.IO example add-on repository",
-  "url": "https://home-assistant.io/",
-  "maintainer": "HomeAssistant <info@home-assistant.io>"
+  "name": "PTentacle addon repository",
+  "url": "https://github.com/ptentacle/hass-addons",
+  "maintainer": "PTentacle"
 }
