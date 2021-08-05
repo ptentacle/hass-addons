@@ -1,0 +1,39 @@
+{
+  "name": "Cloudflare DDNS",
+  "version": "0.1",
+  "slug": "cloudflareddns",
+  "description": "Cloudflare Dynamic DNS service with Let's Encrypt support",
+  "url": "",
+  "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
+  "startup": "services",
+  "map": ["ssl:rw"],
+  "options": {
+    "lets_encrypt": {
+      "accept_terms": false,
+      "certfile": "fullchain.pem",
+      "keyfile": "privkey.pem"
+    },
+    "token": null,
+    "zone_id": null,
+    "domains": [null],
+    "aliases": [],
+    "seconds": 300
+  },
+  "schema": {
+    "lets_encrypt": {
+      "accept_terms": "bool",
+      "certfile": "str",
+      "keyfile": "str"
+    },
+    "ipv4": "str?",
+    "ipv6": "str?",
+    "token": "str",
+    "zone_id": "str",
+    "domains": "str",
+    "aliases": [
+      {"domain": "str", "alias": "str"}
+    ],
+    "seconds": "int"
+  },
+  "image": "homeassistant/{arch}-addon-cloudflareddns"
+}
