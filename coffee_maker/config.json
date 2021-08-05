@@ -1,19 +1,39 @@
 {
-  "name": "Coffee Maker",
-  "version": "1.2",
-  "slug": "coffee_maker",
+  "name": "Cloudflare DDNS",
+  "version": "0.1",
+  "slug": "cloudflareddns",
+  "description": "Cloudflare Dynamic DNS service with Let's Encrypt support",
+  "url": "",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
-  "description": "Expose a web frontend to control my coffee maker",
-  "startup": "before",
-  "boot": "auto",
-  "ports": {
-    "80/tcp": 8080
-  },
+  "startup": "services",
+  "map": ["ssl:rw"],
   "options": {
-    "device": null
+    "lets_encrypt": {
+      "accept_terms": false,
+      "certfile": "fullchain.pem",
+      "keyfile": "privkey.pem"
+    },
+    "token": null,
+    "zone_id": null,
+    "domains": [null],
+    "aliases": [],
+    "seconds": 300
   },
   "schema": {
-    "device": "str"
+    "lets_encrypt": {
+      "accept_terms": "bool",
+      "certfile": "str",
+      "keyfile": "str"
+    },
+    "ipv4": "str?",
+    "ipv6": "str?",
+    "token": "str",
+    "zone_id": "str",
+    "domains": "str",
+    "aliases": [
+      {"domain": "str", "alias": "str"}
+    ],
+    "seconds": "int"
   },
   "image": "hub/{arch}-coffee-maker"
 }
