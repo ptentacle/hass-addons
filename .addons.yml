@@ -1,0 +1,6 @@
+channel: stable
+addons:
+  adguard:
+    repository: ptentacle-hassio-addons/cloudflareddns
+    target: cloudflareddns
+    image: ghcr.io/hassio-addons/adguard/{arch}
