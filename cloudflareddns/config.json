@@ -7,10 +7,6 @@
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "services",
   "map": ["ssl:rw"],
-  "boot": "auto",
-  "ports": {
-    "80/tcp": 8080
-  },
   "options": {
     "lets_encrypt": {
       "accept_terms": false,
