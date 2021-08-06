@@ -1,5 +1,7 @@
 #!/usr/bin/env bashio
 
+bashio::log.error "Starting"
+
 CERT_DIR=/data/letsencrypt
 WORK_DIR=/data/workdir
 
