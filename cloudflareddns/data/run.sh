@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bashio
 
 CERT_DIR=/data/letsencrypt
 WORK_DIR=/data/workdir
