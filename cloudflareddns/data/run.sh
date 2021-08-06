@@ -11,31 +11,19 @@ if bashio::config.has_value "ipv4"; then IPV4=$(bashio::config 'ipv4'); else IPV
 if bashio::config.has_value "ipv6"; then IPV6=$(bashio::config 'ipv6'); else IPV6=""; fi
 CLOUDFLARE_AUTH_KEY=$(bashio::config 'token')
 ZONE_ID=$(bashio::config 'zone_id')
-DOMAINS=$(bashio::config 'domains | join(",")')
+DOMAINS=$(bashio::config 'domains')
 WAIT_TIME=$(bashio::config 'seconds')
 
 # Function that performe a renew
 function le_renew() {
     local domain_args=()
     local domains=''
-    local aliases=''
 
     domains=$(bashio::config 'domains')
 
-    # Prepare domain for Let's Encrypt
-    for domain in ${domains}; do
-        for alias in $(jq --raw-output --exit-status "[.aliases[]|{(.alias):.domain}]|add.\"${domain}\" | select(. != null)" /data/options.json) ; do
-            aliases="${aliases} ${alias}"
-        done
-    done
+    bashio::log.info "Renew certificate for domains: $(echo -n "${domains}")"
 
-    aliases="$(echo "${aliases}" | tr ' ' '\n' | sort | uniq)"
-
-    bashio::log.info "Renew certificate for domains: $(echo -n "${domains}") and aliases: $(echo -n "${aliases}")"
-
-    for domain in $(echo "${domains}" "${aliases}" | tr ' ' '\n' | sort | uniq); do
-        domain_args+=("--domain" "${domain}")
-    done
+    domain_args=("--domain" "${domains}")
 
     dehydrated --cron --hook ./hooks.sh --challenge dns-01 "${domain_args[@]}" --out "${CERT_DIR}" --config "${WORK_DIR}/config" || true
     LE_UPDATE="$(date +%s)"
@@ -70,24 +58,24 @@ while true; do
 
     # IPv4
     domains=$(bashio::config 'domains')
-    for domain in ${domains}; do
-        # get the dns A record id
-        dnsrecordid=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?type=A&name=${dnsrecord}" \
-        -H "Authorization: Bearer ${CLOUDFLARE_AUTH_KEY}" \
-        -H "Content-Type: application/json" | jq -r  '{"result"}[] | .[0] | .id')
 
-        # update A record
-        answer=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${dnsrecordid}" \
-        -H "Authorization: Bearer ${CLOUDFLARE_AUTH_KEY}" \
-        -H "Content-Type: application/json" \
-        --data "{\"type\":\"A\",\"name\":\"${domain}\",\"content\":\"${IPV4}\",\"ttl\":1,\"proxied\":false}" | jq -r  {"success"}[])
+    # get the dns A record id
+    dnsrecordid=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records?type=A&name=${domains}" \
+    -H "Authorization: Bearer ${CLOUDFLARE_AUTH_KEY}" \
+    -H "Content-Type: application/json" | jq -r  '{"result"}[] | .[0] | .id')
 
-        if [ "${answer}" == "true" ]; then
-            bashio::log.info "Update A record success"
-        else
-            bashio::log.warning "Update A record failed"
-        fi
-    done
+    # update A record
+    answer=$(curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${dnsrecordid}" \
+    -H "Authorization: Bearer ${CLOUDFLARE_AUTH_KEY}" \
+    -H "Content-Type: application/json" \
+    --data "{\"type\":\"A\",\"name\":\"${domain}\",\"content\":\"${IPV4}\",\"ttl\":1,\"proxied\":false}" | jq -r  {"success"}[])
+
+    if [ "${answer}" == "true" ]; then
+        bashio::log.info "Update A record success"
+    else
+        bashio::log.warning "Update A record failed"
+    fi
+    
     
     now="$(date +%s)"
     if bashio::config.true 'lets_encrypt.accept_terms' && [ $((now - LE_UPDATE)) -ge 43200 ]; then
