@@ -29,7 +29,7 @@
     "ipv6": "str?",
     "token": "str",
     "zone_id": "str",
-    "domains": "str",
+    "domains": ["str"],
     "aliases": [
       {"domain": "str?", "alias": "str?"}
     ],
